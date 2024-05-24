@@ -27,11 +27,11 @@ const usersSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  profit: {
+  profits: {
     type: Array,
     default: [],
   },
-  cost: {
+  costs: {
     type: Array,
     default: [],
   },

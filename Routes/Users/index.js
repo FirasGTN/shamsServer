@@ -2,6 +2,7 @@ const express = require("express");
 const route = express.Router();
 const app = express();
 const bodyParser = require("body-parser");
+const jwt = require("jsonwebtoken");
 const cors = require("cors");
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -19,11 +20,12 @@ route.get("/getuser/:id", require("./getuser"));
 route.post("/register", require("./register"));
 route.post("/login", require("./login"));
 
-route.get("/getdaily", require("./Profits/getDaily"));
-route.get("/getmonthly", require("./Profits/getMonthly"));
-route.get("/getyearly", require("./Profits/getYearly"));
+route.get("/getcost", require("./Costs/getCost"));
+route.get("/getcostfiltred/:userId", require("./Costs/getCostFiltred"));
+route.post("/addcost", require("./Costs/addCost"));
 
-route.put("/addcost", require("./Costs/addCost"));
+route.get("/getprofit", require("./Profits/getProfit"));
+route.get("/getprofitfiltred/:userId", require("./Profits/getProfitFiltred"));
 route.post("/addprofit", require("./Profits/addProfit"));
 
 route.put("/addservice", require("./Services/addService"));

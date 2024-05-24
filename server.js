@@ -8,7 +8,7 @@ const DB = process.env.DB;
 
 mongoose
   .connect(
-    `mongodb+srv://firasazzebi66:${DB}@cluster0.z3mogai.mongodb.net/ByteChat?retryWrites=true&w=majority`
+    `mongodb+srv://firasazzebi66:${DB}@cluster0.z3mogai.mongodb.net/ShamsDash?retryWrites=true&w=majority`
   )
   .then(() => console.log("connected to the database"))
   .catch((err) => console.log(err));

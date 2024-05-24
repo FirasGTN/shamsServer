@@ -1,73 +1,36 @@
 const User = require("../../../models/Users");
-const Daily = require("../../../models/Daily");
-const Monthly = require("../../../models/Monthly");
-const Yearly = require("../../../models/Yearly");
 
 module.exports = async (req, res) => {
-  let { userid, NCost } = req.body;
   try {
-    const updatedUser = await User.findOneAndUpdate(
-      { _id: userid },
-      { $push: { cost: NCost } },
-      { new: true }
-    );
-    const dailyfilterdate = {
-      year: NCost.date.year,
-      month: NCost.date.month,
-      day: NCost.date.day,
-    };
+    const { userid, amount, date, description } = req.body;
 
-    const daily = await Daily.findOneAndUpdate(
-      { date: dailyfilterdate },
-      { $inc: { cost: NCost.price } },
-      { new: true }
-    );
-    if (!daily) {
-      const newDaily = new Daily({
-        cost: NCost.price,
-        date: dailyfilterdate,
-      });
-      await newDaily.save();
+    // Validate input
+    if (!amount || !date || !description) {
+      return res.status(400).json("Please include all fields");
     }
 
-    const monthfilterdate = {
-      year: NCost.date.year,
-      month: NCost.date.month,
-    };
-
-    const monthly = await Monthly.findOneAndUpdate(
-      { date: monthfilterdate },
-      { $inc: { cost: NCost.price } },
-      { new: true }
-    );
-    if (!monthly) {
-      const newMonthly = new Monthly({
-        cost: NCost.price,
-        date: monthfilterdate,
-      });
-      await newMonthly.save();
+    // Find the user by ID
+    const user = await User.findOne({ _id: userid });
+    if (!user) {
+      console.log("no user");
+      return res.status(404).json("User not found");
     }
 
-    const yearfilterdate = {
-      year: NCost.date.year,
+    // Create a new cost object
+    const newCosts = {
+      description,
+      amount,
+      date: new Date(date), // Ensure date is in Date format
     };
-    const yearly = await Yearly.findOneAndUpdate(
-      { date: yearfilterdate },
-      { $inc: { cost: NCost.price } },
-      { new: true }
-    );
-    if (!yearly) {
-      const newYearly = new Yearly({
-        cost: NCost.price,
-        date: yearfilterdate,
-      });
-      await newYearly.save();
-    }
-    return res.status(200).json({
-      status: true,
-      message: "Cost added succesfully",
-    });
-  } catch (error) {
-    if (error) throw error;
+
+    // Add the new cost to the user's costs array
+    user.costs.push(newCosts);
+
+    // Save the user document to update the costs array
+    await user.save();
+
+    res.status(201).json("Expense added with successfully");
+  } catch (err) {
+    res.status(500).send("Server error");
   }
 };
